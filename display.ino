@@ -3,18 +3,16 @@
 //char userInput[DISPLAY_SIZE + 1] = {0};
 
 //int temp[DISPLAY_SIZE];
-int score = 0;
+int score = 10;
 int highest_score = 0;
-int lives = 3;
+int lives = 2;
 int score_multiplier = 1;
-//String game_mode = "";
 String name = "";
 boolean bombs_disabled = 0;
 
 String userInput;
 
 gameMode currentMode = STANDBY;
-//GameMode previousMode;
 
 void setup()
 {
@@ -42,6 +40,8 @@ void loop()
   }
 }
 
+
+
 void updateDisplay(){
   if(!invalidate) return;
   switch(currentMode){
@@ -49,13 +49,16 @@ void updateDisplay(){
         show(addr_2, "READY");
         break;
       case START_GAME:
-      show(addr_2, "STARTED");
-      show(addr_1, "000000 3");
+        show(addr_2, "STARTED");
+        char buffer[10];
+        sprintf(buffer, "%06d %d", score, lives);
+        show(addr_1, String(buffer));
         break;
       case GAME_OVER:
       show(addr_2, "GAMEOVER");
         if(score> highest_score){
           currentMode = NAME_ENTRY;
+          highest_score = score;
         }
         break;
       case FREEZE:

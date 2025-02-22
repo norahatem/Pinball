@@ -14,23 +14,19 @@ const uint8_t addr_2 = 0x70; // address of first driver IC --should be changed!
 #define MINUS 0x00C0 /* - */
 #define MULTIPLY 0x3FC0 /* * */
 
-// enum command {
-//   //STANDBY = 0x00,
-//   START = 0x01, //what is start game?
-//   //GAMEOVER = 0x02,
-//   LIFE_LOST = 0x03,
-//   FRENZY = 0x04,
-//   FREEZE = 0x05,
-//   NORMAL = 0x06,
-//   LOW_FRUIT = 0x07,
-//   HIGH_FRUIT = 0x08,
-//   BOMB = 0x09,
-//   NAME_ENTRY = 0x0A,
-//   NEXT_LETTER = 0x0B,
-//   PREVIOUS_LETTER = 0x0C,
-//   LETTER_CHOSEN = 0x0D,
-//   NAME_ENTERED = 0x0E
-// };
+enum command {
+  START = 0,
+  LIFE_LOST = 1,
+  FRENZY_command = 2,
+  FREEZE_command = 3,
+  LOW_FRUIT = 4,
+  HIGH_FRUIT = 5,
+  BOMB = 6,
+  NEXT_LETTER = 7,
+  PREVIOUS_LETTER = 8,
+  LETTER_CHOSEN = 9,
+  NAME_ENTERED = 10
+};
 
 
 //ascii
@@ -122,6 +118,7 @@ enum gameMode {
   FREEZE = 3,
   FRENZY = 4,
   NAME_ENTRY = 5
+  //NORMAL = 6
 };
 
 #endif
