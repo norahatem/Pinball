@@ -4,8 +4,32 @@
 #include <Wire.h>
 
 const uint8_t addr_1 = 0x70; // address of first driver IC, can be changed
+const uint8_t addr_2 = 0x70; // address of first driver IC --should be changed!
+
 
 #define SPACE 0x0000
+#define DISPLAY_SIZE 8
+#define PLUS 0x12C0 /* + */
+#define MINUS 0x00C0 /* - */
+#define MULTIPLY 0x3FC0 /* * */
+
+// enum command {
+//   //STANDBY = 0x00,
+//   START = 0x01, //what is start game?
+//   //GAMEOVER = 0x02,
+//   LIFE_LOST = 0x03,
+//   FRENZY = 0x04,
+//   FREEZE = 0x05,
+//   NORMAL = 0x06,
+//   LOW_FRUIT = 0x07,
+//   HIGH_FRUIT = 0x08,
+//   BOMB = 0x09,
+//   NAME_ENTRY = 0x0A,
+//   NEXT_LETTER = 0x0B,
+//   PREVIOUS_LETTER = 0x0C,
+//   LETTER_CHOSEN = 0x0D,
+//   NAME_ENTERED = 0x0E
+// };
 
 
 //ascii
@@ -16,9 +40,9 @@ const uint8_t A_UPPER = 65;
 const uint8_t Z_UPPER = 90;
 
 const uint8_t a_lower = 97;
-const uint8_t z__lower = 112;
+const uint8_t z_lower = 122;
 
-const uint8_t digit_place[8] = {0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E};
+const uint8_t digit_place[DISPLAY_SIZE] = {0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E};
 const uint16_t numbers[10] = {
     0x0C3F, /* 0 */
     0x0406, /* 1 */
@@ -88,6 +112,15 @@ const uint16_t letters_lower[26] = {
     0x2D00, /* x */
     0x028E, /* y */
     0x0848  /* z */
+};
+
+enum gameMode {
+  STANDBY = 0,
+  START_GAME = 1,
+  GAME_OVER = 2,
+  FREEZE = 3,
+  FRENZY = 4,
+  NAME_ENTRY = 5
 };
 
 #endif

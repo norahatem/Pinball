@@ -1,6 +1,20 @@
 #include "./defines.h"
 
-int temp[8];
+//char userInput[DISPLAY_SIZE + 1] = {0};
+
+//int temp[DISPLAY_SIZE];
+int score = 0;
+int highest_score = 0;
+int lives = 3;
+int score_multiplier = 1;
+//String game_mode = "";
+String name = "";
+boolean bombs_disabled = 0;
+
+String userInput;
+
+gameMode currentMode = STANDBY;
+//GameMode previousMode;
 
 void setup()
 {
@@ -11,17 +25,44 @@ void setup()
 
 void loop()
 {
+  updateDisplay();
   // put your main code here, to run repeatedly:
   if(Serial.available()){
     String userInput = Serial.readStringUntil('\n');
     Serial.print("You typed: ");
     Serial.println(userInput);
-    show(userInput);
-    // for(int i =0; i< userInput.length(); i++){
-    //   temp = userInput[i];
-    //   Serial.println(temp);
-    // }
+    //show(addr_1, userInput);
+    currentMode = userInput.toInt();
+    updateDisplay();
   }
+}
+
+void updateDisplay(){
+  switch(currentMode){
+      case STANDBY:
+        show(addr_2, "READY");
+        break;
+      case START_GAME:
+      show(addr_2, "STARTED");
+      show(addr_1, "000000 3");
+        break;
+      case GAME_OVER:
+      show(addr_2, "GAMEOVER");
+        if(score> highest_score){
+          currentMode = NAME_ENTRY;
+        }
+        break;
+      case FREEZE:
+        show(addr_2, "FREEZE");
+        break;
+      case FRENZY:
+        show(addr_2, "FRENZY");
+        score_multiplier = 2;
+        break;
+      case NAME_ENTRY:
+        show(addr_2, "HIGH");
+        break;
+    }
 }
 
 void setup_ht16k33(uint8_t addr)
@@ -43,21 +84,30 @@ void setup_ht16k33(uint8_t addr)
   Wire.endTransmission();
 }
 
-void show(String data){
-  for(uint8_t i = 0; i < 8; i++){
-    temp[i] = data[i];
-    Serial.println(temp[i]);
-    if(temp[i] > 64 && temp[i] < 91){
-      transmit_data(addr_1, digit_place[7-i], letters_upper[temp[i]-65] & 0xFF, letters_upper[temp[i]-65] >> 8);
+
+void show(uint8_t addr, String data){
+  for(uint8_t i = 0; i < DISPLAY_SIZE; i++){
+    //temp[i] = data[i];
+    if(data[i] >= A_UPPER && data[i] <= Z_UPPER){
+      transmit_data(addr_1, digit_place[DISPLAY_SIZE -1 -i], letters_upper[data[i]-A_UPPER] & 0xFF, letters_upper[data[i]-A_UPPER] >> 8);
     } 
-    else if(temp[i] > 96 && temp[i] < 123){
-      transmit_data(addr_1, digit_place[7-i], letters_lower[temp[i]-97] & 0xFF, letters_lower[temp[i]-97] >> 8);
+    else if(data[i] >= a_lower && data[i] <= z_lower){
+      transmit_data(addr_1, digit_place[DISPLAY_SIZE -1 -i], letters_lower[data[i]-a_lower] & 0xFF, letters_lower[data[i]-a_lower] >> 8);
     }
-    else if(temp[i] > 47 && temp[i] < 58){
-      transmit_data(addr_1, digit_place[7-i], numbers[temp[i]-48] & 0xFF, numbers[temp[i]-48] >> 8);
+    else if(data[i] >= zero && data[i] <= nine){
+      transmit_data(addr_1, digit_place[DISPLAY_SIZE -1 -i], numbers[data[i]- zero] & 0xFF, numbers[data[i]- zero] >> 8);
     }
-    else if(temp[i] == 32 || temp[i] == 0){
-      transmit_data(addr_1, digit_place[7-i], SPACE & 0xFF, SPACE >> 8);
+    else if(data[i] == 32 || data[i] == 0){
+      transmit_data(addr, digit_place[DISPLAY_SIZE -1 -i], SPACE & 0xFF, SPACE >> 8);
+    } 
+    else if(data[i] == 43){
+      transmit_data(addr, digit_place[DISPLAY_SIZE -1 -i], PLUS & 0xFF, PLUS >> 8);
+    }
+    else if(data[i] == 45){
+      transmit_data(addr, digit_place[DISPLAY_SIZE -1 -i], MINUS & 0xFF, MINUS >> 8);
+    }
+    else if(data[i] == 42){
+      transmit_data(addr, digit_place[DISPLAY_SIZE -1 -i], MULTIPLY & 0xFF, MULTIPLY >> 8);
     }
   }
 }
