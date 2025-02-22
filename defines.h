@@ -2,6 +2,7 @@
 #define DEFINES_H
 
 #include <Wire.h>
+#include <TimerOne.h>
 
 const uint8_t addr_1 = 0x70; // address of first driver IC, can be changed
 const uint8_t addr_2 = 0x70; // address of first driver IC --should be changed!
