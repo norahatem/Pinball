@@ -18,9 +18,12 @@ void setup()
 {
   // put your setup code here, to run once:
   setup_ht16k33(addr_1);
+  setup_ht16k33(addr_2);
+  show(addr_1, "");
+  show(addr_2, "");
   //Serial.begin(9600);              // Initialize serial communication at 9600 baud
-  Timer1.initialize(1000000);
-  Timer1.attachInterrupt(updateDisplay);
+  // Timer1.initialize(1000000);
+  // Timer1.attachInterrupt(updateDisplay);
   Serial.begin(9600);
 }
 
@@ -36,7 +39,7 @@ void loop()
     //show(addr_1, userInput);
     currentMode = userInput.toInt();
     invalidate = true;
-    // updateDisplay();
+    updateDisplay();
   }
 }
 
