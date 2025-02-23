@@ -32,8 +32,17 @@ void setup()
   Serial.begin(9600);
 }
 
+const unsigned long interval = 5000; // Interval in milliseconds
+unsigned long previousMillis = 0;  // Stores the last time the function was called
+
 void loop()
 {
+  updateDisplay();
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;  // Update time
+    manage(); 
+  }
   updateDisplay();
   // put your main code here, to run repeatedly:
   if(Serial.available()){
@@ -47,6 +56,19 @@ void loop()
     processCommand();
     updateDisplay();
     Serial.println(currentMode);
+  }
+}
+
+uint8_t seconds = 0;
+boolean normalMode = true;
+
+void manage(){
+  updateDisplay();
+  seconds += 1;
+  if(seconds>=5){
+    seconds = 0;
+    normalMode = true;
+    score_multiplier = 1;
   }
 }
 
@@ -78,11 +100,13 @@ void processCommand(){
       //show(addr_2, "-1 LIVES");
       break;
     case FRENZY_com:
+      normalMode = false;
       currentMode = FRENZY;
       score_multiplier = 2;
       //start a timer interrupt to come and disable the frenzy mode after 5 seconds
       break;
     case FREEZE_com:
+      normalMode = false;
       currentMode = FREEZE;
       //start a timer interrupt to come and disable the freeze mode after 5 seconds
       break;
@@ -147,12 +171,15 @@ void processCommand(){
     currentMode = STANDBY;
     break;
   }
-
+  if(normalMode && ((currentMode == FREEZE) || currentMode == FRENZY)){
+    currentMode = START_GAME;
+  }
+  invalidate=true;
 }
 
 
 void updateDisplay(){
-  char buffer[10];
+  char buffer[9];
   if(!invalidate) return;
   switch(currentMode){
     case STANDBY:
@@ -165,6 +192,8 @@ void updateDisplay(){
       show(addr_1, String(buffer));
       break;
     case GAME_OVER:
+      //need to stop accepting any input unless it's start
+      //how to do it
       sprintf(buffer, "%06d %d", score, lives);
       show(addr_1, String(buffer));
       show(addr_2, "GAMEOVER");
