@@ -3,14 +3,20 @@
 //char userInput[DISPLAY_SIZE + 1] = {0};
 
 //int temp[DISPLAY_SIZE];
-int score = 10;
-int highest_score = 0;
-int lives = 2;
-int score_multiplier = 1;
-String name = "";
-boolean bombs_disabled = 0;
+uint16_t score = 0;
+uint8_t previous_score = score;
+uint16_t highest_score = 0;
+uint8_t lives = 3;
+uint8_t score_multiplier = 1;
+//String name = "";
+char name[DISPLAY_SIZE+1] = "A";
+char currentLetter = 'A';
 
-String userInput;
+boolean invalidate= true;
+
+String userInput; //simulate data received from other microcontroller
+
+command receivedCommand = No_command; // start with nothing
 
 gameMode currentMode = STANDBY;
 
@@ -19,15 +25,13 @@ void setup()
   // put your setup code here, to run once:
   setup_ht16k33(addr_1);
   setup_ht16k33(addr_2);
-  show(addr_1, "");
-  show(addr_2, "");
-  //Serial.begin(9600);              // Initialize serial communication at 9600 baud
+  reset_displays();
+  // disabling the timer for now as it kind of causes issues with serial - i guess
   // Timer1.initialize(1000000);
   // Timer1.attachInterrupt(updateDisplay);
   Serial.begin(9600);
 }
 
-boolean invalidate= true;
 void loop()
 {
   updateDisplay();
@@ -37,45 +41,164 @@ void loop()
     Serial.print("You typed: ");
     Serial.println(userInput);
     //show(addr_1, userInput);
-    currentMode = userInput.toInt();
+    //currentMode = userInput.toInt();
+    receivedCommand = userInput.toInt();
     invalidate = true;
+    processCommand();
     updateDisplay();
+    Serial.println(currentMode);
   }
 }
 
+void reset_displays(){
+  show(addr_1, "");
+  show(addr_2, "");
+}
+
+uint8_t name_position = 0;
+void processCommand(){
+  switch(receivedCommand){
+    case No_command:
+      break;
+    case START:
+      reset_displays();
+      lives = 3;
+      score = 0;
+      //name = "A";
+      strcpy(name, "A");
+      currentMode = START_GAME;
+      break;
+    case LIFE_LOST:
+    if(lives <= 0) break;
+      lives -= 1;
+      if(lives == 0){
+        currentMode = GAME_OVER;
+        break;
+      }
+      //show(addr_2, "-1 LIVES");
+      break;
+    case FRENZY_com:
+      currentMode = FRENZY;
+      score_multiplier = 2;
+      //start a timer interrupt to come and disable the frenzy mode after 5 seconds
+      break;
+    case FREEZE_com:
+      currentMode = FREEZE;
+      //start a timer interrupt to come and disable the freeze mode after 5 seconds
+      break;
+    case LOW_FRUIT:
+      score += (10*score_multiplier);
+      currentMode = START_GAME;
+      Serial.print("SCORE: ");
+      Serial.println(score);
+      break;
+    case HIGH_FRUIT:
+      score += (20*score_multiplier);
+      currentMode = START_GAME;
+      Serial.print("SCORE: ");
+      Serial.println(score);
+      break;
+    case BOMB:
+      if(score >= (10*score_multiplier) && currentMode!= FREEZE){
+        score -= (10*score_multiplier);
+      }
+      currentMode = START_GAME;
+      Serial.print("SCORE: ");
+      Serial.println(score);
+      break;
+      /////////////////////////////////////////////////////////////////////////////////////
+  case NEXT_LETTER:
+    currentLetter += 1;
+    Serial.print("next letter: ");
+    Serial.println(currentLetter);
+    if(currentLetter > 'Z'){
+      currentLetter = 'A'; //this is to loop around, there is probably a better way to do it but yea :|
+    }
+    name[strlen(name) - 1] = currentLetter;
+    break;
+  case PREVIOUS_LETTER:
+    currentLetter -= 1;
+    if(currentLetter <'A'){
+      currentLetter = 'Z'; //to loop around the other way,
+    }
+    name[strlen(name) - 1] = currentLetter;
+    break;
+  case LETTER_CHOSEN:
+    // //should write code to go to the next letter --done!
+    // if(name[0] = 'A'){
+    //   name[0] = currentLetter;
+    //   name[1] = 'A';
+    // }else{
+    //   name[strlen(name) - 1] = currentLetter;
+    // }
+    currentLetter = 'A'; //reset curent char to A so that the user can loop through agan
+    name[strlen(name)] = currentLetter;
+    //strncat(name, &currentLetter, 1);// +'A' is to go to the next charachter position!
+    break;
+  case NAME_ENTERED:
+    //probably what i could do is display high name and then wait to receive a reset signal and then go back to standby mode!!!
+    //the displaying is already done! -- however should remove the A that i add after all names for next character
+    //name = name.remove last character
+    if(strlen(name) > 0){
+      name[strlen(name) - 1] = '\0'; //remove last letter added when the letter is chosen
+    }
+    break;
+  case RESET:
+    currentMode = STANDBY;
+    break;
+  }
+
+}
 
 
 void updateDisplay(){
+  char buffer[10];
   if(!invalidate) return;
   switch(currentMode){
-      case STANDBY:
-        show(addr_2, "READY");
-        break;
-      case START_GAME:
-        show(addr_2, "STARTED");
-        char buffer[10];
-        sprintf(buffer, "%06d %d", score, lives);
-        show(addr_1, String(buffer));
-        break;
-      case GAME_OVER:
+    case STANDBY:
+      show(addr_1, "READY TO");
+      show(addr_2, "PLAY");
+      break;
+    case START_GAME:
+      show(addr_2, "PLAYING");
+      sprintf(buffer, "%06d %d", score, lives);
+      show(addr_1, String(buffer));
+      break;
+    case GAME_OVER:
+      sprintf(buffer, "%06d %d", score, lives);
+      show(addr_1, String(buffer));
       show(addr_2, "GAMEOVER");
-        if(score> highest_score){
-          currentMode = NAME_ENTRY;
-          highest_score = score;
-        }
-        break;
-      case FREEZE:
-        show(addr_2, "FREEZE");
-        break;
-      case FRENZY:
-        show(addr_2, "FRENZY");
-        score_multiplier = 2;
-        break;
-      case NAME_ENTRY:
-        show(addr_2, "HIGH");
-        break;
-    }
-    invalidate=false;
+      if(score> highest_score){
+        currentMode = NAME_ENTRY;
+        highest_score = score;
+        name[0] = 'A';
+        name[1] = '\0';
+      }
+      break;
+    case FREEZE:
+      show(addr_2, "FREEZE");
+      break;
+    case FRENZY:
+      show(addr_2, "FRENZY");
+      //score_multiplier = 2;
+      break;
+    case NAME_ENTRY:
+      show(addr_1, "HIGH");
+      show(addr_2, String(name));
+      Serial.print("name: ");
+      Serial.println(name);
+      break;
+    // case NORMAL:
+    //   show(addr_2, "PLAYING");
+    //   break;
+    case SCORE_CHANGE:
+      char score_diff[8];
+      sprintf(score_diff, "%d", score - previous_score);
+      previous_score = score;
+      show(addr_2, String(score_diff));
+      break;
+  }
+  invalidate=false;
 }
 
 void setup_ht16k33(uint8_t addr)

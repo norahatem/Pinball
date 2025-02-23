@@ -17,15 +17,17 @@ const uint8_t addr_2 = 0x70; // address of first driver IC --should be changed!
 enum command {
   START = 0,
   LIFE_LOST = 1,
-  FRENZY_command = 2,
-  FREEZE_command = 3,
+  FRENZY_com = 2,
+  FREEZE_com = 3,
   LOW_FRUIT = 4,
   HIGH_FRUIT = 5,
   BOMB = 6,
   NEXT_LETTER = 7,
   PREVIOUS_LETTER = 8,
   LETTER_CHOSEN = 9,
-  NAME_ENTERED = 10
+  NAME_ENTERED = 10,
+  RESET = 11,
+  No_command = 12
 };
 
 
@@ -40,6 +42,7 @@ const uint8_t a_lower = 97;
 const uint8_t z_lower = 122;
 
 const uint8_t digit_place[DISPLAY_SIZE] = {0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E};
+
 const uint16_t numbers[10] = {
     0x0C3F, /* 0 */
     0x0406, /* 1 */
@@ -117,8 +120,9 @@ enum gameMode {
   GAME_OVER = 2,
   FREEZE = 3,
   FRENZY = 4,
-  NAME_ENTRY = 5
-  //NORMAL = 6
+  NAME_ENTRY = 5,
+  SCORE_CHANGE = 6,
+  //NORMAL = 7
 };
 
 #endif
