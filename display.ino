@@ -88,7 +88,8 @@ void processCommand(){
       lives = 3;
       score = 0;
       //name = "A";
-      strcpy(name, "A");
+      memset(name, 0, 9);
+      name[0] = 'A'; name[1] = 'A';
       currentMode = START_GAME;
       break;
     case LIFE_LOST:
@@ -215,8 +216,8 @@ void updateDisplay(){
     case NAME_ENTRY:
       show(addr_1, "HIGH");
       show(addr_2, String(name));
-      Serial.print("name: ");
-      Serial.println(name);
+      // Serial.print("name: ");
+      // Serial.println(name);
       break;
     // case NORMAL:
     //   show(addr_2, "PLAYING");
