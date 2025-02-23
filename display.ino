@@ -99,13 +99,13 @@ void show(uint8_t addr, String data){
   for(uint8_t i = 0; i < DISPLAY_SIZE; i++){
     //temp[i] = data[i];
     if(data[i] >= A_UPPER && data[i] <= Z_UPPER){
-      transmit_data(addr_1, digit_place[DISPLAY_SIZE -1 -i], letters_upper[data[i]-A_UPPER] & 0xFF, letters_upper[data[i]-A_UPPER] >> 8);
+      transmit_data(addr, digit_place[DISPLAY_SIZE -1 -i], letters_upper[data[i]-A_UPPER] & 0xFF, letters_upper[data[i]-A_UPPER] >> 8);
     } 
     else if(data[i] >= a_lower && data[i] <= z_lower){
-      transmit_data(addr_1, digit_place[DISPLAY_SIZE -1 -i], letters_lower[data[i]-a_lower] & 0xFF, letters_lower[data[i]-a_lower] >> 8);
+      transmit_data(addr, digit_place[DISPLAY_SIZE -1 -i], letters_lower[data[i]-a_lower] & 0xFF, letters_lower[data[i]-a_lower] >> 8);
     }
     else if(data[i] >= zero && data[i] <= nine){
-      transmit_data(addr_1, digit_place[DISPLAY_SIZE -1 -i], numbers[data[i]- zero] & 0xFF, numbers[data[i]- zero] >> 8);
+      transmit_data(addr, digit_place[DISPLAY_SIZE -1 -i], numbers[data[i]- zero] & 0xFF, numbers[data[i]- zero] >> 8);
     }
     else if(data[i] == 32 || data[i] == 0){
       transmit_data(addr, digit_place[DISPLAY_SIZE -1 -i], SPACE & 0xFF, SPACE >> 8);
