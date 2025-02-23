@@ -4,8 +4,8 @@
 #include <Wire.h>
 #include <TimerOne.h>
 
-const uint8_t addr_1 = 0x78; // address of first driver IC, can be changed
-const uint8_t addr_2 = 0x70; // address of first driver IC --should be changed!
+const uint8_t addr_1 = 0x70; // address of first driver IC, can be changed
+const uint8_t addr_2 = 0x78; // address of first driver IC --should be changed!
 
 
 #define SPACE 0x0000
@@ -30,6 +30,16 @@ enum command {
   No_command = 12
 };
 
+enum gameMode {
+  STANDBY = 0,
+  START_GAME = 1,
+  GAME_OVER = 2,
+  FREEZE = 3,
+  FRENZY = 4,
+  NAME_ENTRY = 5,
+  SCORE_CHANGE = 6,
+  //NORMAL = 7
+};
 
 //ascii
 const uint8_t zero = 48; 
@@ -112,17 +122,6 @@ const uint16_t letters_lower[26] = {
     0x2D00, /* x */
     0x028E, /* y */
     0x0848  /* z */
-};
-
-enum gameMode {
-  STANDBY = 0,
-  START_GAME = 1,
-  GAME_OVER = 2,
-  FREEZE = 3,
-  FRENZY = 4,
-  NAME_ENTRY = 5,
-  SCORE_CHANGE = 6,
-  //NORMAL = 7
 };
 
 #endif
