@@ -3,6 +3,7 @@
 //char userInput[DISPLAY_SIZE + 1] = {0};
 
 //int temp[DISPLAY_SIZE];
+
 uint16_t score = 0;
 uint8_t previous_score = score;
 uint16_t highest_score = 0;
@@ -30,31 +31,30 @@ void setup()
   // Timer1.initialize(1000000);
   // Timer1.attachInterrupt(updateDisplay);
   Serial.begin(9600);
+  updateDisplay();
 }
 
-const unsigned long interval = 5000; // Interval in milliseconds
+const unsigned long interval = 500; // 1 second
 unsigned long previousMillis = 0;  // Stores the last time the function was called
+unsigned long currentMillis = millis();
 
 void loop()
 {
-  updateDisplay();
-  unsigned long currentMillis = millis();
+  currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;  // Update time
-    manage(); 
+    manage(); //call manage function
   }
-  updateDisplay();
   // put your main code here, to run repeatedly:
+  //check for user input -- simulating the commands from the other arduino 
   if(Serial.available()){
     String userInput = Serial.readStringUntil('\n');
     Serial.print("You typed: ");
     Serial.println(userInput);
-    //show(addr_1, userInput);
-    //currentMode = userInput.toInt();
     receivedCommand = userInput.toInt();
-    invalidate = true;
+    //invalidate = true;
     processCommand();
-    updateDisplay();
+    //updateDisplay();
     Serial.println(currentMode);
   }
 }
@@ -63,13 +63,14 @@ uint8_t seconds = 0;
 boolean normalMode = true;
 
 void manage(){
-  updateDisplay();
   seconds += 1;
-  if(seconds>=5){
+  if(seconds>=10){
     seconds = 0;
     normalMode = true;
     score_multiplier = 1;
+    invalidate = true;
   }
+  updateDisplay();
 }
 
 void reset_displays(){
@@ -83,7 +84,7 @@ void processCommand(){
     case No_command:
       break;
     case START:
-      reset_displays();
+      //reset_displays();
       lives = 3;
       score = 0;
       //name = "A";
@@ -171,15 +172,15 @@ void processCommand(){
     currentMode = STANDBY;
     break;
   }
-  if(normalMode && ((currentMode == FREEZE) || currentMode == FRENZY)){
-    currentMode = START_GAME;
-  }
   invalidate=true;
 }
 
 
 void updateDisplay(){
   char buffer[9];
+  if(normalMode && ((currentMode == FREEZE) || currentMode == FRENZY)){
+  currentMode = START_GAME;
+  }
   if(!invalidate) return;
   switch(currentMode){
     case STANDBY:
