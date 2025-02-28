@@ -63,8 +63,8 @@ void loop()
 }
 
 void manage(){
-  seconds += 1;
-  if(seconds>= 20 && !normalMode){
+  if(!normalMode)   seconds += 1;
+  if(seconds>= 20 ){
     seconds = 0;
     normalMode = true;
     score_multiplier = 1;
@@ -180,8 +180,8 @@ void updateDisplay(){
   if(currentMode != STANDBY) show(addr_1, String(buffer));
   switch(currentMode){
     case STANDBY:
-      show(addr_1, "READY TO");
-      show(addr_2, "PLAY");
+      show(addr_2, "READY TO");
+      show(addr_1, "PLAY");
       break;
     case START_GAME:
       show(addr_2, "PLAYING");

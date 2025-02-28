@@ -5,7 +5,7 @@
 #include <TimerOne.h>
 
 const uint8_t addr_1 = 0x70; // address of first driver IC, can be changed
-const uint8_t addr_2 = 0x78; // address of first driver IC --should be changed!
+const uint8_t addr_2 = 0x71; // address of first driver IC --should be changed!
 
 
 #define SPACE 0x0000
@@ -15,7 +15,7 @@ const uint8_t addr_2 = 0x78; // address of first driver IC --should be changed!
 #define MULTIPLY 0x3FC0 /* * */
 
 enum command {
-  START = 0,
+  No_command = 0,
   LIFE_LOST = 1,
   FRENZY_com = 2,
   FREEZE_com = 3,
@@ -27,7 +27,7 @@ enum command {
   LETTER_CHOSEN = 9,
   NAME_ENTERED = 10,
   RESET = 11,
-  No_command = 12
+  START = 12
 };
 
 enum gameMode {
